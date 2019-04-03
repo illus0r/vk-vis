@@ -14,23 +14,23 @@
 		<script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
 		<script type="text/javascript"> 
 			VK.init(function() { 
-				// API initialization succeeded 
-				// Your code here 
-				// +4096 messages
-				// var hist = VK.callMethod("messages.getHistory", 0, 10, '184177213', 184177213);
 				VK.callMethod("showSettingsBox", 4096);
 				VK.addCallback('onSettingsChanged', function f(data){ 
-            alert("settings: " + data); 
+					console.log("settings: " + data); 
+					console.log('>>> Fetching hist…');
+					VK.api("messages.getHistory",
+									{"peer_id": "184177213",
+										"count": "20",
+										"v":"5.80"},
+									function (data) {
+										console.log('>>> history is here:');
+										console.log(data);
+									});
         });
-				console.log('>>> Fetching hist…');
-				VK.api("messages.getHistory", {"peer_id": "184177213", "count": "20", "v":"5.80"}, function (data) {
-					console.log('>>> history is here:');
-					console.log(data);
-				});
 			}, function() { 
 				// API initialization failed 
 				// Can reload page here 
-				console.log('NO :–(');
+				console.log('>>> vk init failed');
 			}, '5.92'); 
 		</script>
 		</script>
