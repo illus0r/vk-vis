@@ -16,11 +16,14 @@
 			 // API initialization succeeded 
 			 // Your code here 
 				console.log('YOOOOOOOOOOOOOOOO');
-				VK.callMethod("showSettingsBox", 8214);
+			  // +4096 messages
+				VK.callMethod("showSettingsBox", 4096);
+				var hist = VK.callMethod("messages.getHistory", 0, 10, '184177213', 184177213);
+				console.log(hist);
 			}, function() { 
 			 // API initialization failed 
 			 // Can reload page here 
-			 console.log('NOOOOOOOOOOOOOOOO');
+			 console.log('NO :–(');
 		}, '5.92'); 
 	</script>
 	</script>
