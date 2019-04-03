@@ -1,6 +1,7 @@
-alert('hi');
 
-window.location.replace('https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=messages&response_type=token&v=5.92&revoke=1');
+console.log('location');
+
+window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=messages&response_type=token&v=5.92&revoke=1";
 
 VK.init(function() { 
 	//VK.callMethod("showSettingsBox", 4096);
