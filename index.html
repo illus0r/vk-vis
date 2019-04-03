@@ -17,8 +17,8 @@
 				// API initialization succeeded 
 				// Your code here 
 				// +4096 messages
-				// VK.callMethod("showSettingsBox", 4096);
 				// var hist = VK.callMethod("messages.getHistory", 0, 10, '184177213', 184177213);
+				VK.callMethod("showSettingsBox", 4096);
 				console.log('>>> Fetching hist…');
 				VK.api("messages.getHistory", {"peer_id": "184177213", "count": "20", "v":"5.80"}, function (data) {
 					console.log('>>> history is here:');
