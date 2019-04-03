@@ -8,7 +8,7 @@
 		<p>Hi.</p>
 		<div id="canvas-wrapper"></div>
 		<p>Hi.</p>
-		history
+		history2
 		<!--<script src='./node_modules/p5/lib/p5.min.js'></script>-->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
 		<script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
@@ -16,12 +16,13 @@
 			VK.init(function() { 
 				// API initialization succeeded 
 				// Your code here 
-				console.log('YOOOOOOOOOOOOOOOO');
 				// +4096 messages
 				// VK.callMethod("showSettingsBox", 4096);
 				// var hist = VK.callMethod("messages.getHistory", 0, 10, '184177213', 184177213);
+				console.log('>>> Fetching hist…');
 				VK.api("messages.getHistory", {"peer_id": "184177213", "count": "20", "v":"5.80"}, function (data) {
-					console.log(data.response);
+					console.log('>>> history is here:');
+					console.log(data);
 				});
 			}, function() { 
 				// API initialization failed 
