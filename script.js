@@ -1,31 +1,31 @@
-VK.init(function() { 
-	//VK.callMethod("showSettingsBox", 4096);
-	VK.callMethod("showSettingsBox", 2);
-	VK.addCallback('onSettingsChanged', function f(data){ 
-		console.log("settings: " + data); 
-		console.log('>>> Fetching…');
-		VK.api("friends.get",
-						{"user_id": "85504912",
-							"count": "10",
-							"v":"5.8"},
-						function (data) {
-							console.log('>>> friends:');
-							console.log(data);
-						});
-		//VK.api("messages.getHistory",
-						//{"peer_id": "184177213",
-							//"count": "20",
-							//"v":"5.80"},
+//VK.init(function() { 
+	////VK.callMethod("showSettingsBox", 4096);
+	//VK.callMethod("showSettingsBox", 2);
+	//VK.addCallback('onSettingsChanged', function f(data){ 
+		//console.log("settings: " + data); 
+		//console.log('>>> Fetching…');
+		//VK.api("friends.get",
+						//{"user_id": "85504912",
+							//"count": "10",
+							//"v":"5.8"},
 						//function (data) {
-							//console.log('>>> history is here:');
+							//console.log('>>> friends:');
 							//console.log(data);
 						//});
-	});
-}, function() { 
-	// API initialization failed 
-	// Can reload page here 
-	console.log('>>> vk init failed');
-}, '5.92'); 
+		////VK.api("messages.getHistory",
+						////{"peer_id": "184177213",
+							////"count": "20",
+							////"v":"5.80"},
+						////function (data) {
+							////console.log('>>> history is here:');
+							////console.log(data);
+						////});
+	//});
+//}, function() { 
+	//// API initialization failed 
+	//// Can reload page here 
+	//console.log('>>> vk init failed');
+//}, '5.92'); 
 
 
 // p5js
