@@ -1,6 +1,57 @@
+var hash = window.location.hash.substr(1);
+
+var result = hash.split('&').reduce(function (result, item) {
+    var parts = item.split('=');
+    result[parts[0]] = parts[1];
+    return result;
+}, {});
+
+if(!result.access_token){
+  window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://vk.dianov.org/&scope=friends&response_type=token&v=5.92&revoke=1";
+}
+else{
+  console.log(result.access_token)
+  var script = document.createElement('SCRIPT');
+  script.src = "https://api.vk.com/method/friends.get?user_id=85504912&count=10&fields=nickname,photo_50&access_token="+result.access_token+"&v=5.8&callback=callbackFunc";
+  document.getElementsByTagName("head")[0].appendChild(script);
+  function callbackFunc(d) {
+    console.log(d)
+    d.response.items.forEach(function(friend){
+      console.log(friend.photo_50)
+    })
+    // p5
+    
+    let friends = d.response.items;
+
+    const sketch = (p) => {
+      p.preload = () => {
+        for(var i = 0; i < friends.length; i++){
+          friends[i].photo_50_img = p.loadImage(friends[i].photo_50);
+        }
+        //logo = p.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
+      }
+      p.setup = () => {
+        var canvas = p.createCanvas(256, 256)
+        p.frameRate(4)
+      }
+      p.draw = () => {
+        let img = p.random(friends).photo_50_img
+        p.image(img, 0, 0)
+      }
+    }
+    let myp5 = new p5(sketch)
+
+  }
+}
+
+
+
+////window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.92&revoke=1";
+
+
 //VK.init(function() { 
-	////VK.callMethod("showSettingsBox", 4096);
-	//VK.callMethod("showSettingsBox", 2);
+	////VK.callMethod("showSettingsBox", 4096); // 
+	//VK.callMethod("showSettingsBox", 2); //
 	//VK.addCallback('onSettingsChanged', function f(data){ 
 		//console.log("settings: " + data); 
 		//console.log('>>> Fetching…');
@@ -28,43 +79,18 @@
 //}, '5.92'); 
 
 
-// p5js
+//// p5js
 
 
-function setup() {
-  var canvas = createCanvas(56, 56)
-	canvas.parent('canvas-wrapper')
-  noStroke()
-  noiseDetail(1)
-}
+////function setup() {
+  ////var canvas = createCanvas(100, 100);
+  ////canvas.parent('canvas-wrapper');
+  ////background(255, 0, 200);
+	////ellipse(50, 50, 80, 80);
+////}
 
-function drawK(time, pos, color, yK, v1, v2){
-  fill(color)
-  var widthK = width*noise(time, pos, 0)*1.5
-  var crossPos = createVector(widthK, yK)
-  var armPos = crossPos.copy().add(v1)
-  var legPos = crossPos.copy().add(v2)
-  point(crossPos.x, crossPos.y)
-  rect(0, 0, widthK, height)
-  beginShape()
-  vertex(armPos.x, armPos.y)
-  vertex(crossPos.x, crossPos.y)
-  vertex(legPos.x, legPos.y)
-  endShape(CLOSE)
-}
+////function draw() {
+////}
 
-function draw() {
-  blendMode(NORMAL)
-  background('white')
-  blendMode(MULTIPLY)
-  var time = frameCount/200
-  var pos = mouseX / 100
-  var timeSplit = 0
-  var posSplit = 10
-  var yK = height*noise(time, pos, 100)*1.5
-  var v1 = p5.Vector.fromAngle(radians(45), width*2)
-  var v2 = p5.Vector.fromAngle(radians(-45), width*2)
-  drawK(time, pos, 'cyan', yK, v1, v2)
-  drawK(time+timeSplit, pos+posSplit, 'yellow', yK, v1, v2)
-  drawK(time+2*timeSplit, pos+2*posSplit, 'magenta', yK, v1, v2)
-}
+
+
