@@ -1,11 +1,11 @@
 
 console.log('location');
 
-window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=messages&response_type=token&v=5.92&revoke=1";
+window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=friends&response_type=token&v=5.92&revoke=1";
 
 VK.init(function() { 
-	//VK.callMethod("showSettingsBox", 4096);
-	VK.callMethod("showSettingsBox", 2);
+	//VK.callMethod("showSettingsBox", 4096); // 
+	VK.callMethod("showSettingsBox", 2); //
 	VK.addCallback('onSettingsChanged', function f(data){ 
 		console.log("settings: " + data); 
 		console.log('>>> Fetching…');
@@ -36,15 +36,15 @@ VK.init(function() {
 // p5js
 
 
-function setup() {
-  var canvas = createCanvas(100, 100);
-  canvas.parent('canvas-wrapper');
-  background(255, 0, 200);
-	ellipse(50, 50, 80, 80);
-}
+//function setup() {
+  //var canvas = createCanvas(100, 100);
+  //canvas.parent('canvas-wrapper');
+  //background(255, 0, 200);
+	//ellipse(50, 50, 80, 80);
+//}
 
-function draw() {
-}
+//function draw() {
+//}
 
 
 
