@@ -32,15 +32,18 @@ else{
       p.setup = () => {
         var canvas = p.createCanvas(256, 256)
         for(var i = 0; i < friends.length; i++){
-          friends[i].photo_50_img = p.loadImage(friends[i].photo_50, img =>{
+           p.loadImage(friends[i].photo_50, img =>{
+            friends[i].photo_50_img = img
             p.image(img, 0, 0);
-          });
+           }, err => {
+             console.log('CORS, mofucker')
+           });
         }
         p.frameRate(4)
       }
       p.draw = () => {
         let img = p.random(friends).photo_50_img
-        p.image(img, 0, 0)
+        p.image(img, p.random(200), p.random(200))
       }
     }
     let myp5 = new p5(sketch)
