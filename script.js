@@ -7,8 +7,8 @@ var result = hash.split('&').reduce(function (result, item) {
 }, {});
 
 if(!result.access_token){
-  //window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://vk.dianov.org/&scope=friends&response_type=token&v=5.92&revoke=1";
-  window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=http://localhost:3000/&scope=friends&response_type=token&v=5.92&revoke=1";
+  window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://vk.dianov.org/&scope=friends&response_type=token&v=5.92&revoke=1";
+  //window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=http://localhost:3000/&scope=friends&response_type=token&v=5.92&revoke=1";
 }
 else{
   console.log(result.access_token)
