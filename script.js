@@ -12,7 +12,7 @@ if(!result.access_token){
 else{
   console.log(result.access_token)
   var script = document.createElement('SCRIPT');
-  script.src = "https://api.vk.com/method/friends.get?user_id=85504912&count=10&fields=nickname,photo_50&access_token="+result.access_token+"&v=5.8&callback=callbackFunc";
+  script.src = "https://api.vk.com/method/friends.get?count=10&fields=nickname,photo_50&access_token="+result.access_token+"&v=5.8&callback=callbackFunc";
   document.getElementsByTagName("head")[0].appendChild(script);
   function callbackFunc(d) {
     console.log(d)
