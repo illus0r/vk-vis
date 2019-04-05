@@ -27,13 +27,15 @@ else{
     document.write('Hello World!');
     const sketch = (p) => {
       p.preload = () => {
-        for(var i = 0; i < friends.length; i++){
-          friends[i].photo_50_img = p.loadImage(friends[i].photo_50);
-        }
         //logo = p.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
       }
       p.setup = () => {
         var canvas = p.createCanvas(256, 256)
+        for(var i = 0; i < friends.length; i++){
+          friends[i].photo_50_img = p.loadImage(friends[i].photo_50, img =>{
+            p.image(img, 0, 0);
+          });
+        }
         p.frameRate(4)
       }
       p.draw = () => {
