@@ -7,12 +7,13 @@ var result = hash.split('&').reduce(function (result, item) {
 }, {});
 
 if(!result.access_token){
-  window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://vk.dianov.org/&scope=friends&response_type=token&v=5.92&revoke=1";
+  //window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://vk.dianov.org/&scope=friends&response_type=token&v=5.92&revoke=1";
+  window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=http://localhost:3000/&scope=friends&response_type=token&v=5.92&revoke=1";
 }
 else{
   console.log(result.access_token)
   var script = document.createElement('SCRIPT');
-  script.src = "https://api.vk.com/method/friends.get?count=10&fields=nickname,photo_50&access_token="+result.access_token+"&v=5.8&callback=callbackFunc";
+  script.src = "https://api.vk.com/method/friends.get?count=128&fields=nickname,photo_50&access_token="+result.access_token+"&v=5.8&callback=callbackFunc";
   document.getElementsByTagName("head")[0].appendChild(script);
   function callbackFunc(d) {
     console.log(d)
@@ -23,6 +24,7 @@ else{
     
     let friends = d.response.items;
 
+    document.write('Hello World!');
     const sketch = (p) => {
       p.preload = () => {
         for(var i = 0; i < friends.length; i++){
