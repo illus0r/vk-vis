@@ -22,7 +22,7 @@ else{
     })
     // p5
     
-    let friends = d.response.items;
+    var friends = d.response.items;
 
     document.write('Hello World!');
     const sketch = (p) => {
