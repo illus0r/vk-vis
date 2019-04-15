@@ -10,7 +10,7 @@ var code = url.searchParams.get("code");
 	//return result;
 //}, {});
 
-if(code){
+if(!code){
 	console.log(result)
 	alert(result)
 	window.location = "https://slack.com/oauth/authorize?client_id=469055206374.592441363778&scope=channels:history&redirect_uri=https://vk.dianov.org/slack.html";
