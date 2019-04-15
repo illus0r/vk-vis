@@ -7,7 +7,7 @@ var result = hash.split('&').reduce(function (result, item) {
 }, {});
 
 if(!result.code){
-window.location = "https://slack.com/oauth/authorize?client_id=469055206374.592441363778&scope=channels:history&redirect_uri=http://localhost:3000/slack.html";
+window.location = "https://slack.com/oauth/authorize?client_id=469055206374.592441363778&scope=channels:history&redirect_uri=https://vk.dianov.org/slack.html";
 	//window.location = "https://oauth.vk.com/authorize?client_id=6926310&display=page&redirect_uri=https://vk.dianov.org/&scope=friends&response_type=token&v=5.92&revoke=1";
 }
 else{
