@@ -43,7 +43,7 @@ function FormatNumberLength(num, length) {
 }
 
 var msgs = []
-var people = []
+var peopleRaw = []
 
 //// regex prayground
 //let str = `
@@ -62,22 +62,29 @@ var limit = 20
 var terminated = 0
 
 for(let i=0; i<limit; i++){
+//for(let i=9; i<=9; i++){
 	let filename = 'vk-hist-200-' + FormatNumberLength(i,2) + '.json'
 	fetch('assets/data/' + filename)
 		.then(response => response.text())
 		.then(str => {
-			//let json_str = str.replace(/(?<="(text|title|description|artist)": )".*?"(?=(,|\n}))/gs, 'true');
-			let json_str = str.replace(/(?<="\w+": )".*?"(?=(,\n|\n}))/gs, 'true');
+			//let json_str = str.replace(/(?<="(text|title|description|artist|name)": )".*?"(?=(,\n|\n}))/gs, 'true');
+			let json_str = str.replace(/(?<="(?!(photo_100|photo_200|first_name|last_name))\w*": )".*?"(?=(,\n|\n}))/gs, 'true');
+			//let json_str = str.replace(/(?<="\w+": )".*?"(?=(,\n|\n}))/gs, 'true');
 			//console.log(filename)
 			//console.log(json_str)
 			let json = JSON.parse(json_str);
 			msgs = msgs.concat(json.response.items)
-			people = people.concat(json.response.profiles)
+			peopleRaw = peopleRaw.concat(json.response.profiles)
 			terminated += 1
 			if (terminated === limit) {
 				process()
 			}
 })
+}
+
+function randomIntFromInterval(min,max)
+{
+    return Math.floor(Math.random()*(max-min+1)+min);
 }
 
 function process(){
@@ -109,11 +116,11 @@ function process(){
 
 	msgGrouped = msgGrouped.map(e => {
 		var dates = {}
-		console.log(e.values[0])
+		//console.log(e.values[0])
 		e.values.forEach(d => {
 			dates[d.key] = d.value
 		})
-		console.log(dates)
+		//console.log(dates)
 		return {
 			person: e.key,
 			dates: dates,
@@ -126,48 +133,80 @@ function process(){
 	})
 	console.log(msgGrouped)
 
-	people = people.map(e => {
-		return {
-			id: e.id,
-			name: e.first_name + ' ' + e.last_name,
-			img: e.photo_100,
+	var people = {}
+	msgGrouped.forEach(p => {
+		let personRaw = peopleRaw.filter(d => d.id == p.person)[0]
+		//console.log(personRaw)
+		people[p.person] = 
+		{
+			name: personRaw.first_name + ' ' + personRaw.last_name,
+			img: personRaw.photo_100,
+			color: randomIntFromInterval(0, 100),
+			totalNumber: 0,
+			totalNumberPrev: 0,
 		}
 	})
-	//console.log(people)
+	console.log('people')
+	console.log(people)
 	//console.log(usrs.filter(u => u.id == 190348091))
 
 
-	var peopleStates = []
 	var dateScale = d3.scaleTime()
     .domain([new Date(2018, 8, 1), new Date(2019, 6, 1)])
     .range([0, 960])
 
-	// p5
+	var dateSpan = d3.timeDay.range(new Date(2018, 8, 1), new Date(2019, 6, 1), 1)
+
+
+	// p5 ================================================
 	const sketch = (p) => {
+		var canvasLines
+		var fontMono
 		p.preload = () => {
 			//logo = p.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
+			fontMono = p.loadFont('assets/fonts/ShareTechMono-Regular.ttf')
 		}
+		var canvasLines
 		p.setup = () => {
 			var canvas = p.createCanvas(p.windowWidth,512)
-			p.background('silver')
-			p.frameRate(4)
+			canvasLines = p.createGraphics(p.width, p.height)
+			p.frameRate(20)
+			p.colorMode(p.HSB, 100)
+			canvasLines.colorMode(p.HSB, 100)
+			canvasLines.blendMode(p.MULTIPLY)
 
-			p.strokeWeight(3)
-			msgGrouped.forEach(person => {
-				var totalNumber = 0
-				let dateSpan = d3.timeDay.range(new Date(2018, 8, 1), new Date(2019, 6, 1), 1)
-				dateSpan.forEach(date =>{
-					let number = person.dates[date]
-					if(number){
-						totalNumber += number
-					}
-					let x = dateScale(date)
-					let y = totalNumber
-					p.point(x, p.height - y)
-				})
-			})
 		}
 		p.draw = () => {
+			p.background('white')
+			let date = dateSpan[p.frameCount]
+			let dateStr = date.getFullYear() +
+				'.' + (date.getMonth()+1) +
+				'.' + date.getDate()
+			p.push()
+			  p.scale(1, 5);
+				p.textFont(fontMono, 100)
+				p.text(dateStr, 0, 100)
+			p.pop()
+			msgGrouped.forEach(msgPerson => {
+				person = people[msgPerson.person]
+				//console.log(person)
+				let number = msgPerson.dates[date]
+				if(number){
+					person.totalNumber += number
+				}
+				let dx = dateScale(new Date(2000,0,2)) - dateScale(new Date(2000,0,1))
+				let xPrev = dateScale(date) - dx
+				let yPrev = person.totalNumberPrev
+				let x = dateScale(date)
+				let y = person.totalNumber
+				person.totalNumberPrev = person.totalNumber
+				canvasLines.strokeWeight(1)
+				canvasLines.stroke(person.color, 100, 100)
+				canvasLines.line(xPrev, p.height - yPrev, x, p.height - y)
+				//canvasLines.noStroke()
+				p.text(person.name, x, p.height - y)
+				p.image(canvasLines, 0, 0)
+			})
 		}
 	}
 	let myp5 = new p5(sketch)
@@ -179,10 +218,8 @@ function process(){
 
 	// TODO
 	// Анимировать появление.
-	//	- Засунуть в draw. Чтобы с каждым фреймом рисовалась одна дата.
-	//	- Рисовать эту дату на картинку
 	// Нариовать имена и аватарки.
-	//	- 
+	//	- рисовать через картинку `canvasLines`
 	// 
 
 }
