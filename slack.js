@@ -1,12 +1,16 @@
-var hash = window.location.hash.substr(1);
+var url_string = window.location.href
+var url = new URL(url_string);
+var code = url.searchParams.get("code");
 
-var result = hash.split('&').reduce(function (result, item) {
-	var parts = item.split('=');
-	result[parts[0]] = parts[1];
-	return result;
-}, {});
+//var hash = window.location.hash.substr(1);
 
-if(!result.code){
+//var result = hash.split('&').reduce(function (result, item) {
+	//var parts = item.split('=');
+	//result[parts[0]] = parts[1];
+	//return result;
+//}, {});
+
+if(code){
 	console.log(result)
 	alert(result)
 	window.location = "https://slack.com/oauth/authorize?client_id=469055206374.592441363778&scope=channels:history&redirect_uri=https://vk.dianov.org/slack.html";
@@ -16,5 +20,5 @@ else{
 	// removing hash from the url
 	// to avoid `access_token` being shared occasionaly
 	//history.pushState("", document.title, window.location.pathname);
-	console.log(result.code)
+	console.log(code)
 }
