@@ -1,39 +1,3 @@
-
-
-//const sketch = (p) => {
-////function preload() {
-////// Get the most recent earthquake in the database
-////}
-
-////function setup() {
-////}
-
-////function draw() {
-////background(200)
-////let earthquakeMag = earthquakes.features[0].properties.mag
-////let earthquakeName = earthquakes.features[0].properties.place
-////ellipse(width / 2, height / 2, earthquakeMag * 10, earthquakeMag * 10)
-////textAlign(CENTER)
-////text(earthquakeName, 0, height - 30, width, 30)
-////}
-//let earthquakes;
-//p.preload = () => {
-//let url = 'assets/data/vk-hist-200.json'
-//earthquake = p.loadJSON(url, () => {}, () => this._decrementPreload());
-//}
-//p.setup = () => {
-//var canvas = p.createCanvas(p.windowWidth, p.windowHeight)
-//console.log(earthquake)
-//p.noLoop()
-//}
-//p.draw = () => {
-//}
-//}
-//let myp5 = new p5(sketch)
-
-
-
-
 function FormatNumberLength(num, length) {
 	var r = "" + num;
 	while (r.length < length) {
@@ -44,19 +8,6 @@ function FormatNumberLength(num, length) {
 
 var msgs = []
 var peopleRaw = []
-
-//// regex prayground
-//let str = `
-//"city": "Батуми",
-//"title": "Батуми, Грузия"
-//}
-//},
-//"conversation_message_id": 32559,
-
-//`
-//let json_str = str.replace(/(?<="(text|title|description)": )".*?"(?=(,|\n}))/gs, 'true');
-//console.log(json_str)
-
 
 var limit = 20
 var terminated = 0
@@ -88,9 +39,6 @@ function randomIntFromInterval(min,max)
 }
 
 function process(){
-	//console.log(msgs)
-	//console.log(people)
-
 	// Stripping and formating the data
 	msgs = msgs.map(e => {
 		let date = new Date(e.date*1000)
@@ -136,7 +84,6 @@ function process(){
 	var people = {}
 	msgGrouped.forEach(p => {
 		let personRaw = peopleRaw.filter(d => d.id == p.person)[0]
-		//console.log(personRaw)
 		people[p.person] = 
 		{
 			name: personRaw.first_name + ' ' + personRaw.last_name,
@@ -148,7 +95,6 @@ function process(){
 	})
 	console.log('people')
 	console.log(people)
-	//console.log(usrs.filter(u => u.id == 190348091))
 
 
 	var dateScale = d3.scaleTime()
@@ -158,18 +104,34 @@ function process(){
 	var dateSpan = d3.timeDay.range(new Date(2018, 8, 1), new Date(2019, 6, 1), 1)
 
 
+
+
+
+
+
+
 	// p5 ================================================
 	const sketch = (p) => {
+
+
+
 		var canvasLines
 		var canvasTest
 		var fontMono
+
+
+
 		p.preload = () => {
 			//logo = p.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
 			fontMono = p.loadFont('assets/fonts/ShareTechMono-Regular.ttf')
 		}
 		var canvasLines
+
+
+
 		p.setup = () => {
 			var canvas = p.createCanvas(p.windowWidth,512)
+			canvas.parent('canvas-wrapper')
 			canvasLines = p.createGraphics(p.width, p.height)
 			canvasTest = p.createGraphics(10000, p.height)
 			canvasTest.background('yellow')
@@ -177,42 +139,81 @@ function process(){
 			p.colorMode(p.HSB, 100)
 			canvasLines.colorMode(p.HSB, 100)
 			canvasLines.blendMode(p.MULTIPLY)
+		}
+
+
+
+		function Label(){
+			this.name = 'hello'
+			this.color = 'red'
+			this.value = 1234
+			this.y = 50
+		}
+
+
+		function Model(graphDateSpan = 10){
+			this.labels = []
+			this.data = []
+			this.currentDate = new Date(2000,0,2)
+			this.currentDateStr = '2000.01.02'
+			this.graphDateSpan = graphDateSpan
+
+			// process
+			this.process = function(){
+				this.currentDate = dateSpan[p.frameCount]
+				this.currentDateStr = this.currentDate.getFullYear() +
+					'.' + (this.currentDate.getMonth()+1) +
+					'.' + this.currentDate.getDate()
+				// move labels
+				// move lines
+			}
+
+			// draw
+			this.draw = function(){
+				// Big digits
+				p.push()
+					p.scale(1, 5);
+					p.textFont(fontMono, 100)
+					p.text(this.currentDateStr, 0, 100)
+				p.pop()
+
+				msgGrouped.forEach(msgPerson => {
+					person = people[msgPerson.person]
+					//console.log(person)
+					let number = msgPerson.dates[this.currentDate]
+					if(number){
+						person.totalNumber += number
+					}
+					let dx = dateScale(new Date(2000,0,2)) - dateScale(new Date(2000,0,1))
+					let xPrev = dateScale(this.currentDate) - dx
+					let yPrev = person.totalNumberPrev
+					let x = dateScale(this.currentDate)
+					let y = person.totalNumber
+					person.totalNumberPrev = person.totalNumber
+					canvasLines.strokeWeight(1)
+					canvasLines.stroke(person.color, 100, 80)
+					canvasLines.line(xPrev, p.height - yPrev - 1, x, p.height - y - 1)
+					p.text(person.name, x, p.height - y)
+					p.image(canvasLines, 0, 0)
+				})
+			}
 
 		}
+		
+		var model = new Model(10)
+
+
+
 		p.draw = () => {
 			p.background('white')
-			p.image(canvasTest, 0, 0, )
 
-			let date = dateSpan[p.frameCount]
-			let dateStr = date.getFullYear() +
-				'.' + (date.getMonth()+1) +
-				'.' + date.getDate()
-			p.push()
-			  p.scale(1, 5);
-				p.textFont(fontMono, 100)
-				p.text(dateStr, 0, 100)
-			p.pop()
-			msgGrouped.forEach(msgPerson => {
-				person = people[msgPerson.person]
-				//console.log(person)
-				let number = msgPerson.dates[date]
-				if(number){
-					person.totalNumber += number
-				}
-				let dx = dateScale(new Date(2000,0,2)) - dateScale(new Date(2000,0,1))
-				let xPrev = dateScale(date) - dx
-				let yPrev = person.totalNumberPrev
-				let x = dateScale(date)
-				let y = person.totalNumber
-				person.totalNumberPrev = person.totalNumber
-				canvasLines.strokeWeight(1)
-				canvasLines.stroke(person.color, 100, 80)
-				canvasLines.line(xPrev, p.height - yPrev - 1, x, p.height - y - 1)
-				//canvasLines.noStroke()
-				p.text(person.name, x, p.height - y)
-				p.image(canvasLines, 0, 0)
-			})
+			model.process()
+			model.draw()
+
 		}
+
+
+
 	}
 	let myp5 = new p5(sketch)
 
