@@ -161,6 +161,7 @@ function process(){
 	// p5 ================================================
 	const sketch = (p) => {
 		var canvasLines
+		var canvasTest
 		var fontMono
 		p.preload = () => {
 			//logo = p.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
@@ -170,7 +171,9 @@ function process(){
 		p.setup = () => {
 			var canvas = p.createCanvas(p.windowWidth,512)
 			canvasLines = p.createGraphics(p.width, p.height)
-			p.frameRate(20)
+			canvasTest = p.createGraphics(10000, p.height)
+			canvasTest.background('yellow')
+			p.frameRate(30)
 			p.colorMode(p.HSB, 100)
 			canvasLines.colorMode(p.HSB, 100)
 			canvasLines.blendMode(p.MULTIPLY)
@@ -178,6 +181,8 @@ function process(){
 		}
 		p.draw = () => {
 			p.background('white')
+			p.image(canvasTest, 0, 0, )
+
 			let date = dateSpan[p.frameCount]
 			let dateStr = date.getFullYear() +
 				'.' + (date.getMonth()+1) +
@@ -201,8 +206,8 @@ function process(){
 				let y = person.totalNumber
 				person.totalNumberPrev = person.totalNumber
 				canvasLines.strokeWeight(1)
-				canvasLines.stroke(person.color, 100, 100)
-				canvasLines.line(xPrev, p.height - yPrev, x, p.height - y)
+				canvasLines.stroke(person.color, 100, 80)
+				canvasLines.line(xPrev, p.height - yPrev - 1, x, p.height - y - 1)
 				//canvasLines.noStroke()
 				p.text(person.name, x, p.height - y)
 				p.image(canvasLines, 0, 0)
@@ -211,16 +216,6 @@ function process(){
 	}
 	let myp5 = new p5(sketch)
 
-
-
-
-
-
-	// TODO
-	// Анимировать появление.
-	// Нариовать имена и аватарки.
-	//	- рисовать через картинку `canvasLines`
-	// 
 
 }
 
