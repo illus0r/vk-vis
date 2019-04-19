@@ -127,7 +127,8 @@ function process(){
 
 
 		p5.preload = () => {
-			//logo = p5.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
+			btnRestart = p5.loadImage('./assets/images/btn-restart.png');
+			btnRestartHover = p5.loadImage('./assets/images/btn-restart-hover.png');
 			fontMono = p5.loadFont('assets/fonts/ShareTechMono-Regular.ttf')
 		}
 
@@ -143,6 +144,7 @@ function process(){
 			canvasLines.colorMode(p5.HSB, 100)
 			p5.colorMode(p5.HSB, 100)
 			canvasLines.strokeWeight(3)
+			p5.ellipseMode(p5.CENTER)
 		}
 
 
@@ -205,6 +207,8 @@ function process(){
 			this.dateArray = d3.timeDay.range(new Date(2018, 9, 1), new Date(2019, 3, 10), 1)
 			//console.log('dates in array: ', this.dateArray.length)
 			this.isPaused = false
+			this.step = 0
+			this.isBtnReplayHover = false
 
 			// Init
 			// Fill cumulative data
@@ -226,11 +230,13 @@ function process(){
 			this.process = function(){
 				if(!this.isPaused){
 					// date
-					this.currentDate = this.dateArray[p5.frameCount]
-					if(!this.currentDate){
+					var cd = this.dateArray[this.step]
+					if(!cd){
 						this.isPaused = true
 					}
 					else{
+						this.currentDate = cd
+						this.step+=1
 						this.currentDateStr =
 							FormatNumberLength(this.currentDate.getDate(), 2) +	'.' +
 							FormatNumberLength(this.currentDate.getMonth()+1, 2) + '.' +
@@ -246,75 +252,91 @@ function process(){
 
 			// draw
 			this.draw = function(){
-				if(!this.isPaused){
-					p5.blendMode(p5.NORMAL)
-					p5.background('white')
-					//canvasLines.blendMode(p5.NORMAL)
-					canvasLines.background('white')
-					//canvasLines.blendMode(p5.MULTIPLY)
+				p5.blendMode(p5.NORMAL)
+				p5.background('white')
+				canvasLines.background('white')
 
-					// Big digits
-					canvasLines.push()
-					canvasLines.translate(-canvasMargins.left, -canvasMargins.top)
-					canvasLines.noStroke()
-					canvasLines.scale(1.01, 3)
-					canvasLines.textFont(fontMono, 180)
-					canvasLines.textStyle(p5.BOLD)
-					canvasLines.text(this.currentDateStr, 10, 143)
-					canvasLines.pop()
+				// Big digits
+				canvasLines.push()
+				canvasLines.translate(-canvasMargins.left, -canvasMargins.top)
+				canvasLines.noStroke()
+				canvasLines.scale(1.01, 3)
+				canvasLines.textFont(fontMono, 180)
+				canvasLines.textStyle(p5.BOLD)
+				canvasLines.text(this.currentDateStr, 10, 143)
+				canvasLines.pop()
 
-					//lines
-					//
-					// find the most productive person to normalize data:
-					let maxPerson = Object.keys(people).reduce((a, b) =>
-						people[a].data[this.currentDate] > people[b].data[this.currentDate]  ? a : b)
-					var maxValue = people[maxPerson].data[this.currentDate]
-					//console.log(maxValue)
-					var yScale = d3.scaleLinear()
-						.domain([0, maxValue])
-						.range([canvasLines.height-3, 3])
+				//lines
+				//
+				// find the most productive person to normalize data:
+				let maxPerson = Object.keys(people).reduce((a, b) =>
+					people[a].data[this.currentDate] > people[b].data[this.currentDate]  ? a : b)
+				var maxValue = people[maxPerson].data[this.currentDate]
+				//console.log(maxValue)
+				var yScale = d3.scaleLinear()
+					.domain([0, maxValue])
+					.range([canvasLines.height-3, 3])
 
-					// for every person draw a line
-					for (const [personId, person] of Object.entries(people)) {
-						canvasLines.stroke(person.color, 100, 90)
-						//p5.text(person.name, 20, 100)
-						var xp = this.dateScale(this.currentDate)
-						var yp = yScale(person.data[this.currentDate])
-						for(let i = 0; i < this.graphDateSpan+2; i++){
-							//let date = this.dateArray[p5.frameCount-i]
-							//let date = new Date(this.currentDate - 86400000*i)
-							let date = d3.timeDay.offset(this.currentDate, -i)
-							var x = this.dateScale(date)
-							var y = yScale(person.data[date])
-							if(!y){
-								//console.log('person.data', person.data)
-								//console.log('date', date)
-								//console.log('person.data[date]', person.data[date])
-								//console.log('y', y)
-							}
-							if(x & y){
-								canvasLines.line(x,y,xp,yp)
-								xp = x
-								yp = y		
-							}
+				// for every person draw a line
+				for (const [personId, person] of Object.entries(people).sort((a, b) => {
+					return a[1].data[this.currentDate]-b[1].data[this.currentDate]
+				})){
+					canvasLines.stroke(person.color, 100, 90)
+					//p5.text(person.name, 20, 100)
+					var xp = this.dateScale(this.currentDate)
+					var yp = yScale(person.data[this.currentDate])
+					for(let i = 0; i < this.graphDateSpan+2; i++){
+						let date = d3.timeDay.offset(this.currentDate, -i)
+						var x = this.dateScale(date)
+						var y = yScale(person.data[date])
+						if(!y){
+							//console.log('person.data', person.data)
+							//console.log('date', date)
+							//console.log('person.data[date]', person.data[date])
+							//console.log('y', y)
 						}
-
-						p5.push()
-						//p5.blendMode(p5.MULTIPLY)
-						p5.image(canvasLines, canvasMargins.left, canvasMargins.top)
-
-						// labels
-						//p5.text(person.name, 512, p5.height - person.data[this.currentDate] - 0)
-						//p5.text(person.data[this.currentDate], 512, p5.height - person.data[this.currentDate] + 10)
-						let l = labels.filter(l=>l.personId == personId)[0]
-						l.setValue(person.data[this.currentDate])
-						//l.setYAim(yScale(person.data[this.dateArray[p5.frameCount-1]]))
-						l.setYAim(yScale(person.data[this.currentDate]))
-						l.process()
-						l.draw()
-						p5.pop()
+						if(x & y){
+							canvasLines.line(x,y,xp,yp)
+							xp = x
+							yp = y		
+						}
 					}
 
+					p5.push()
+					//p5.blendMode(p5.MULTIPLY)
+					p5.image(canvasLines, canvasMargins.left, canvasMargins.top)
+
+					// labels
+					//p5.text(person.name, 512, p5.height - person.data[this.currentDate] - 0)
+					//p5.text(person.data[this.currentDate], 512, p5.height - person.data[this.currentDate] + 10)
+					let l = labels.filter(l=>l.personId == personId)[0]
+					l.setValue(person.data[this.currentDate])
+					l.setYAim(yScale(person.data[this.currentDate]))
+					l.process()
+					l.draw()
+					p5.pop()
+				}
+				if(this.isPaused){
+					var center ={
+						x: (canvasWidth + canvasMargins.left - canvasMargins.right)/2,
+						y: (canvasHeight + canvasMargins.top - canvasMargins.bottom)/2
+					}
+					var img
+					if(p5.pow(p5.mouseX-center.x, 2)
+						+p5.pow(p5.mouseY-center.y+10, 2) <= 27*27){
+						img = btnRestart
+						this.isBtnReplayHover = true
+					}
+					else{
+						img = btnRestartHover
+						this.isBtnReplayHover = false
+					}
+					p5.image(img, 
+						center.x - img.width/4, 
+					  center.y - img.height/4,
+						img.width/2,
+						img.height/2						
+					)
 				}
 			}
 		}
@@ -327,6 +349,19 @@ function process(){
 			model.process()
 			model.draw()
 		}
+
+		p5.mouseClicked = (event) => {
+			console.log('yo1')
+			if (model.isPaused == true && model.isBtnReplayHover == true ) {
+				model.step = 1
+				model.isPaused = false
+				console.log('yo2')
+			}
+		}
+		//function p5.mouseClicked() {
+		//console.log('yo')
+		//}
+
 	}
 	let myp5 = new p5(sketch)
 }
