@@ -34,3 +34,7 @@ p.footer{
   color: grey;
 
 }
+
+#canvas-wrapper{
+	height: 480px;
+}
