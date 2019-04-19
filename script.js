@@ -9,12 +9,13 @@ function FormatNumberLength(num, length) {
 var msgs = []
 var peopleRaw = []
 
-var limit = 20
+//var limit = 20
+var limit = 1 // for fake data
 var terminated = 0
 
 for(let i=0; i<limit; i++){
-//for(let i=9; i<=9; i++){
-	let filename = 'vk-hist-200-' + FormatNumberLength(i,2) + '.json'
+	//let filename = 'vk-hist-200-' + FormatNumberLength(i,2) + '.json'
+	let filename = 'stripped.json'
 	fetch('assets/data/' + filename)
 		.then(response => response.text())
 		.then(str => {
@@ -53,6 +54,9 @@ function process(){
 		}
 	})
 
+	console.log("msgs")
+	console.log(msgs[0])
+
 	// Group by users, then by date
 	let msgGrouped = d3.nest()
 		.key(function(d) { return d.person; })
@@ -60,7 +64,6 @@ function process(){
 		.rollup(leafs => leafs.length)
 		.entries(msgs);
 
-	//console.log(msgGrouped)
 
 	msgGrouped = msgGrouped.map(e => {
 		var dates = {}
@@ -79,7 +82,6 @@ function process(){
 			//}),
 		}
 	})
-	//console.log(msgGrouped)
 
 	var people = {}
 	msgGrouped.forEach(p5 => {
@@ -239,7 +241,7 @@ function process(){
 			  let maxPerson = Object.keys(people).reduce((a, b) =>
 					people[a].data[this.currentDate] > people[b].data[this.currentDate]  ? a : b)
 				var maxValue = people[maxPerson].data[this.currentDate]
-				console.log(maxValue)
+				//console.log(maxValue)
 				var yScale = d3.scaleLinear()
 					.domain([0, maxValue])
 					.range([canvasLines.height-3, 3])
@@ -257,10 +259,10 @@ function process(){
 						var x = this.dateScale(date)
 						var y = yScale(person.data[date])
 						if(!y){
-						  console.log('person.data', person.data)
-						  console.log('date', date)
-						  console.log('person.data[date]', person.data[date])
-						  console.log('y', y)
+							//console.log('person.data', person.data)
+							//console.log('date', date)
+							//console.log('person.data[date]', person.data[date])
+							//console.log('y', y)
 						}
 						if(x & y){
 							canvasLines.line(x,y,xp,yp)
