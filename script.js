@@ -30,7 +30,7 @@ for(let i=0; i<limit; i++){
 			if (terminated === limit) {
 				process()
 			}
-})
+	})
 }
 
 function randomIntFromInterval(min,max)
@@ -79,12 +79,12 @@ function process(){
 			//}),
 		}
 	})
-	console.log(msgGrouped)
+	//console.log(msgGrouped)
 
 	var people = {}
-	msgGrouped.forEach(p => {
-		let personRaw = peopleRaw.filter(d => d.id == p.person)[0]
-		people[p.person] = 
+	msgGrouped.forEach(p5 => {
+		let personRaw = peopleRaw.filter(d => d.id == p5.person)[0]
+		people[p5.person] = 
 		{
 			name: personRaw.first_name + ' ' + personRaw.last_name,
 			img: personRaw.photo_100,
@@ -93,15 +93,10 @@ function process(){
 			totalNumberPrev: 0,
 		}
 	})
-	console.log('people')
-	console.log(people)
+	//console.log('people')
+	//console.log(people)
 
 
-	var dateScale = d3.scaleTime()
-    .domain([new Date(2018, 8, 1), new Date(2019, 6, 1)])
-    .range([0, 960])
-
-	var dateSpan = d3.timeDay.range(new Date(2018, 8, 1), new Date(2019, 6, 1), 1)
 
 
 
@@ -111,34 +106,32 @@ function process(){
 
 
 	// p5 ================================================
-	const sketch = (p) => {
+	const sketch = (p5) => {
 
 
 
 		var canvasLines
-		var canvasTest
 		var fontMono
 
 
 
-		p.preload = () => {
-			//logo = p.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
-			fontMono = p.loadFont('assets/fonts/ShareTechMono-Regular.ttf')
+		p5.preload = () => {
+			//logo = p5.loadImage('https://pp.userapi.com/c846121/v846121012/137080/hS3GMvGZEkI.jpg?ava=1');
+			fontMono = p5.loadFont('assets/fonts/ShareTechMono-Regular.ttf')
 		}
 		var canvasLines
 
 
 
-		p.setup = () => {
-			var canvas = p.createCanvas(p.windowWidth,512)
+		p5.setup = () => {
+			var canvas = p5.createCanvas(p5.windowWidth,512)
 			canvas.parent('canvas-wrapper')
-			canvasLines = p.createGraphics(p.width, p.height)
-			canvasTest = p.createGraphics(10000, p.height)
-			canvasTest.background('yellow')
-			p.frameRate(30)
-			p.colorMode(p.HSB, 100)
-			canvasLines.colorMode(p.HSB, 100)
-			canvasLines.blendMode(p.MULTIPLY)
+			canvasLines = p5.createGraphics(512, p5.height)
+			p5.frameRate(10)
+			p5.colorMode(p5.HSB, 100)
+			canvasLines.colorMode(p5.HSB, 100)
+			p5.colorMode(p5.HSB, 100)
+			canvasLines.strokeWeight(3)
 		}
 
 
@@ -148,76 +141,170 @@ function process(){
 			this.color = 'red'
 			this.value = 1234
 			this.y = 50
+			this.yAim = 50
+
+			this.setYAim = function(yAim){
+				this.yAim = yAim
+			}
+
+			this.setValue = function(value){
+				this.value = value
+			}
+
+			this.process = function(){
+				this.y = this.yAim
+			}
+
+			this.draw = function(){
+				p5.push()
+				p5.noStroke()
+				p5.rect(512,this.y-12,200,24)
+				p5.text(this.value, 512, this.y + 10)
+				p5.fill(this.color, 100, 90)
+				p5.text(this.name, 512, this.y - 0)
+				p5.pop()
+			}
+		}
+
+		var labels = []
+		for (const [personId, person] of Object.entries(people)) {
+			let l = new Label()
+			l.name = person.name
+			l.color = person.color
+			l.personId = personId
+			labels.push(l)
 		}
 
 
 		function Model(graphDateSpan = 10){
 			this.labels = []
 			this.data = []
-			this.currentDate = new Date(2000,0,2)
-			this.currentDateStr = '2000.01.02'
+			this.currentDate
+			this.currentDateStr
 			this.graphDateSpan = graphDateSpan
+			this.dateScale = d3.scaleTime()
+					.domain([this.currentDate-this.graphDateSpan, this.currentDate])
+					.range([0, 512])
+			this.dateArray = d3.timeDay.range(new Date(2018, 9, 1), new Date(2019, 3, 10), 1)
+			//console.log('dates in array: ', this.dateArray.length)
+			this.isPaused = false
+
+			// Init
+			// Fill cumulative data
+			msgGrouped.forEach(msgPerson => {
+				person = people[msgPerson.person]
+				person.data = {}
+				var totalNumber = 0
+				// filling the cumulative array within every person
+				this.dateArray.forEach(d => {
+					let number = msgPerson.dates[d]
+					if(number){
+						totalNumber += number
+					}
+					person.data[d] = totalNumber
+				})
+			})
 
 			// process
 			this.process = function(){
-				this.currentDate = dateSpan[p.frameCount]
-				this.currentDateStr = this.currentDate.getFullYear() +
-					'.' + (this.currentDate.getMonth()+1) +
-					'.' + this.currentDate.getDate()
-				// move labels
-				// move lines
+				if(!this.isPaused){
+					// date
+					this.currentDate = this.dateArray[p5.frameCount]
+					if(!this.currentDate){
+						this.isPaused = true
+					}
+					else{
+						this.currentDateStr = this.currentDate.getFullYear() +
+							'.' + (this.currentDate.getMonth()+1) +
+							'.' + this.currentDate.getDate()
+
+						// date range
+						this.dateScale = d3.scaleTime()
+							.domain([new Date(this.currentDate - 86400000*this.graphDateSpan), this.currentDate])
+							.range([0, canvasLines.width])
+					}
+				}
 			}
 
 			// draw
 			this.draw = function(){
-				// Big digits
-				p.push()
-					p.scale(1, 5);
-					p.textFont(fontMono, 100)
-					p.text(this.currentDateStr, 0, 100)
-				p.pop()
+				if(!this.isPaused){
+				p5.blendMode(p5.NORMAL)
+				p5.background('white')
+				canvasLines.background('white')
+				canvasLines.blendMode(p5.NORMAL)
 
-				msgGrouped.forEach(msgPerson => {
-					person = people[msgPerson.person]
-					//console.log(person)
-					let number = msgPerson.dates[this.currentDate]
-					if(number){
-						person.totalNumber += number
+
+				// find the most productive person to normalize data:
+			  let maxPerson = Object.keys(people).reduce((a, b) =>
+					people[a].data[this.currentDate] > people[b].data[this.currentDate]  ? a : b)
+				var maxValue = people[maxPerson].data[this.currentDate]
+				console.log(maxValue)
+				var yScale = d3.scaleLinear()
+					.domain([0, maxValue])
+					.range([canvasLines.height-3, 3])
+
+				// for every person draw a line
+				for (const [personId, person] of Object.entries(people)) {
+					canvasLines.stroke(person.color, 100, 90)
+					//p5.text(person.name, 20, 100)
+					var xp = this.dateScale(this.currentDate)
+					var yp = yScale(person.data[this.currentDate])
+					for(let i = 0; i < this.graphDateSpan; i++){
+						//let date = this.dateArray[p5.frameCount-i]
+						//let date = new Date(this.currentDate - 86400000*i)
+						let date = d3.timeDay.offset(this.currentDate, -i)
+						var x = this.dateScale(date)
+						var y = yScale(person.data[date])
+						if(!y){
+						  console.log('person.data', person.data)
+						  console.log('date', date)
+						  console.log('person.data[date]', person.data[date])
+						  console.log('y', y)
+						}
+						if(x & y){
+							canvasLines.line(x,y,xp,yp)
+							xp = x
+							yp = y		
+						}
 					}
-					let dx = dateScale(new Date(2000,0,2)) - dateScale(new Date(2000,0,1))
-					let xPrev = dateScale(this.currentDate) - dx
-					let yPrev = person.totalNumberPrev
-					let x = dateScale(this.currentDate)
-					let y = person.totalNumber
-					person.totalNumberPrev = person.totalNumber
-					canvasLines.strokeWeight(1)
-					canvasLines.stroke(person.color, 100, 80)
-					canvasLines.line(xPrev, p.height - yPrev - 1, x, p.height - y - 1)
-					p.text(person.name, x, p.height - y)
-					p.image(canvasLines, 0, 0)
-				})
-			}
 
+					p5.push()
+					//p5.blendMode(p5.MULTIPLY)
+					p5.image(canvasLines, 0, 0)
+
+					// labels
+					//p5.text(person.name, 512, p5.height - person.data[this.currentDate] - 0)
+					//p5.text(person.data[this.currentDate], 512, p5.height - person.data[this.currentDate] + 10)
+					let l = labels.filter(l=>l.personId == personId)[0]
+					l.setValue(person.data[this.currentDate])
+					//l.setYAim(yScale(person.data[this.dateArray[p5.frameCount-1]]))
+					l.setYAim(yScale(person.data[this.currentDate]))
+					l.process()
+					l.draw()
+					p5.pop()
+				}
+
+				// Big digits
+				p5.push()
+				p5.scale(1, 5);
+				p5.textFont(fontMono, 100)
+				p5.text(this.currentDateStr, 0, 100)
+				p5.pop()
+				}
+			}
 		}
 		
-		var model = new Model(10)
+		var model = new Model(30)
 
 
 
-		p.draw = () => {
-			p.background('white')
-
+		p5.draw = () => {
 			model.process()
 			model.draw()
-
 		}
-
-
-
 	}
 	let myp5 = new p5(sketch)
-
-
 }
 
 
