@@ -35,7 +35,7 @@ for(let i=0; i<limit; i++){
 
 function randomIntFromInterval(min,max)
 {
-    return Math.floor(Math.random()*(max-min+1)+min);
+	return Math.floor(Math.random()*(max-min+1)+min);
 }
 
 function process(){
@@ -220,7 +220,7 @@ function process(){
 
 						// date range
 						this.dateScale = d3.scaleTime()
-							.domain([new Date(this.currentDate - 86400000*this.graphDateSpan), this.currentDate])
+							.domain([d3.timeDay.offset(this.currentDate, -this.graphDateSpan), this.currentDate])
 							.range([0, canvasLines.width])
 					}
 				}
@@ -250,7 +250,7 @@ function process(){
 					//p5.text(person.name, 20, 100)
 					var xp = this.dateScale(this.currentDate)
 					var yp = yScale(person.data[this.currentDate])
-					for(let i = 0; i < this.graphDateSpan; i++){
+					for(let i = 0; i < this.graphDateSpan+2; i++){
 						//let date = this.dateArray[p5.frameCount-i]
 						//let date = new Date(this.currentDate - 86400000*i)
 						let date = d3.timeDay.offset(this.currentDate, -i)
