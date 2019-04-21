@@ -1,13 +1,11 @@
-@import url('https://rsms.me/inter/inter.css');
-html {
-  font-family: 'Inter', sans-serif;
+* {
+  box-sizing: border-box;
 }
 
-@supports (font-variation-settings: normal) {
-  html {
-    font-family: 'Inter var', sans-serif;
-  }
-}
+@import url('https://rsms.me/inter/inter.css');
+
+
+@import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono');
 
 html {
   height: 100%;
@@ -18,23 +16,31 @@ html {
 
 h1 {
   font-size: 64px;
- 
+  margin: 0px;
+  font-family: 'Share Tech Mono', monospace;
+
 }
+
+p {
+  margin: 0px;
+  padding-top: 10px;
+  font-family: 'Inter', sans-serif;
+}
+
 a {
-  color: #6051F8;
+  color: #0926E6;
   text-decoration-line: none;
 }
 
 .logo {
-  height: 25px;
-  
+  padding-top: 10px;
+  height: 50px;
 }
 
-p.footer{
+p.footer {
   color: grey;
-
 }
 
-#canvas-wrapper{
-	height: 480px;
+#canvas-wrapper {
+  height: 480px;
 }
