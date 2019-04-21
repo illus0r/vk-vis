@@ -17,8 +17,7 @@ html {
 h1 {
   font-size: 64px;
   margin: 0px;
-  font-family: 'Share Tech Mono', monospace;
-
+  font-family: 'Inter', sans-serif;
 }
 
 p {
