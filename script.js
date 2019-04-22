@@ -19,11 +19,10 @@ for(let i=0; i<limit; i++){
 	fetch('assets/data/' + filename)
 		.then(response => response.text())
 		.then(str => {
-			//let json_str = str.replace(/(?<="(text|title|description|artist|name)": )".*?"(?=(,\n|\n}))/gs, 'true');
-			let json_str = str.replace(/(?<="(?!(photo_100|photo_200|first_name|last_name))\w*": )".*?"(?=(,\n|\n}))/gs, 'true');
-			//let json_str = str.replace(/(?<="\w+": )".*?"(?=(,\n|\n}))/gs, 'true');
-			//console.log(filename)
-			//console.log(json_str)
+			let json_str = str
+			// Disabled the next string cause Safari doesn't support lookbehinds yet
+			// json_str = json_str.replace(/(?<="(?!(photo_100|photo_200|first_name|last_name))\w*": )".*?"(?=(,\n|\n}))/gs, 'true');
+			//
 			let json = JSON.parse(json_str);
 			msgs = msgs.concat(json.response.items)
 			peopleRaw = peopleRaw.concat(json.response.profiles)
@@ -54,8 +53,8 @@ function process(){
 		}
 	})
 
-	console.log("msgs")
-	console.log(msgs[0])
+	//console.log("msgs")
+	//console.log(msgs[0])
 
 	// Group by users, then by date
 	let msgGrouped = d3.nest()
@@ -67,11 +66,9 @@ function process(){
 
 	msgGrouped = msgGrouped.map(e => {
 		var dates = {}
-		//console.log(e.values[0])
 		e.values.forEach(d => {
 			dates[d.key] = d.value
 		})
-		//console.log(dates)
 		return {
 			person: e.key,
 			dates: dates,
@@ -84,9 +81,9 @@ function process(){
 	})
 
 	var people = {}
-	msgGrouped.forEach(p5 => {
-		let personRaw = peopleRaw.filter(d => d.id == p5.person)[0]
-		people[p5.person] = 
+	msgGrouped.forEach(p => {
+		let personRaw = peopleRaw.filter(d => d.id == p.person)[0]
+		people[p.person] = 
 			{
 				name: personRaw.first_name + ' ' + personRaw.last_name,
 				img: personRaw.photo_100,
@@ -95,8 +92,6 @@ function process(){
 				totalNumberPrev: 0,
 			}
 	})
-	//console.log('people')
-	//console.log(people)
 
 
 
@@ -130,6 +125,7 @@ function process(){
 			btnRestart = p5.loadImage('./assets/images/btn-restart.png');
 			btnRestartHover = p5.loadImage('./assets/images/btn-restart-hover.png');
 			fontMono = p5.loadFont('assets/fonts/ShareTechMono-Regular.ttf')
+			//fontMono = p5.loadFont('assets/fonts/SourceCodePro-Black.ttf')
 		}
 
 
@@ -181,7 +177,7 @@ function process(){
 				p5.fill(this.color, 100, 90)
 				p5.textAlign(p5.RIGHT)
 				p5.textStyle(p5.BOLD)
-				p5.text(this.value, 0, this.y + 0)
+				p5.text(Math.floor(this.value), 0, this.y + 0)
 				//
 				p5.pop()
 			}
@@ -205,7 +201,6 @@ function process(){
 			this.graphDateSpan = graphDateSpan
 			this.dateScale
 			this.dateArray = d3.timeDay.range(new Date(2018, 9, 1), new Date(2019, 3, 10), 1)
-			//console.log('dates in array: ', this.dateArray.length)
 			this.isPaused = false
 			this.step = 0
 			this.isBtnReplayHover = false
@@ -222,7 +217,7 @@ function process(){
 					if(number){
 						totalNumber += number
 					}
-					person.data[d] = totalNumber
+					person.data[d.getTime()] = totalNumber
 				})
 			})
 
@@ -265,13 +260,23 @@ function process(){
 				canvasLines.textStyle(p5.BOLD)
 				canvasLines.text(this.currentDateStr, 10, 143)
 				canvasLines.pop()
+				//canvasLines.push()
+				////canvasLines.translate(-canvasMargins.left + 12, -canvasMargins.top - 80)
+				//canvasLines.translate(-canvasMargins.left+ 105, -canvasMargins.top + 16)
+				//console.log(p5.mouseX, p5.mouseY)
+				//canvasLines.noStroke()
+				//canvasLines.scale(1., 2)
+				//canvasLines.textFont(fontMono, 120)
+				//canvasLines.textStyle(p5.BOLD)
+				//canvasLines.text(this.currentDateStr, 10, 143)
+				//canvasLines.pop()
 
 				//lines
 				//
 				// find the most productive person to normalize data:
 				let maxPerson = Object.keys(people).reduce((a, b) =>
-					people[a].data[this.currentDate] > people[b].data[this.currentDate]  ? a : b)
-				var maxValue = people[maxPerson].data[this.currentDate]
+					people[a].data[this.currentDate.getTime()] > people[b].data[this.currentDate.getTime()]  ? a : b)
+				var maxValue = people[maxPerson].data[this.currentDate.getTime()]
 				//console.log(maxValue)
 				var yScale = d3.scaleLinear()
 					.domain([0, maxValue])
@@ -279,27 +284,34 @@ function process(){
 
 				// for every person draw a line
 				for (const [personId, person] of Object.entries(people).sort((a, b) => {
-					return a[1].data[this.currentDate]-b[1].data[this.currentDate]
+					return a[1].data[this.currentDate.getTime()]-b[1].data[this.currentDate.getTime()]
 				})){
 					canvasLines.stroke(person.color, 100, 90)
 					//p5.text(person.name, 20, 100)
 					var xp = this.dateScale(this.currentDate)
-					var yp = yScale(person.data[this.currentDate])
+					var yp = yScale(person.data[this.currentDate.getTime()])
+					if(!yp){
+						//console.log('person.data', person.data)
+						//console.log('date', date)
+						//console.log('person.data[date]', person.data[date])
+						//console.log(person.data[date])
+						console.log(person.name)
+						console.log(person.data)
+						console.log(this.currentDate)
+						console.log(person.data[this.currentDate.getTime()])
+					}
 					for(let i = 0; i < this.graphDateSpan+2; i++){
 						let date = d3.timeDay.offset(this.currentDate, -i)
 						var x = this.dateScale(date)
-						var y = yScale(person.data[date])
-						if(!y){
-							//console.log('person.data', person.data)
-							//console.log('date', date)
-							//console.log('person.data[date]', person.data[date])
-							//console.log('y', y)
-						}
+						var y = yScale(person.data[date.getTime()])
 						if(x & y){
 							canvasLines.line(x,y,xp,yp)
 							xp = x
 							yp = y		
 						}
+						//if(!x || !y || !xp || !yp){
+							//console.log(x,y,xp,yp)
+						//}
 					}
 
 					p5.push()
@@ -310,8 +322,8 @@ function process(){
 					//p5.text(person.name, 512, p5.height - person.data[this.currentDate] - 0)
 					//p5.text(person.data[this.currentDate], 512, p5.height - person.data[this.currentDate] + 10)
 					let l = labels.filter(l=>l.personId == personId)[0]
-					l.setValue(person.data[this.currentDate])
-					l.setYAim(yScale(person.data[this.currentDate]))
+					l.setValue(person.data[this.currentDate.getTime()])
+					l.setYAim(yScale(person.data[this.currentDate.getTime()]))
 					l.process()
 					l.draw()
 					p5.pop()
@@ -351,16 +363,13 @@ function process(){
 		}
 
 		p5.mouseClicked = (event) => {
-			console.log('yo1')
+			//console.log('yo1')
 			if (model.isPaused == true && model.isBtnReplayHover == true ) {
 				model.step = 1
 				model.isPaused = false
-				console.log('yo2')
+				//console.log('yo2')
 			}
 		}
-		//function p5.mouseClicked() {
-		//console.log('yo')
-		//}
 
 	}
 	let myp5 = new p5(sketch)
