@@ -18,11 +18,14 @@ h1 {
   font-size: 64px;
   margin: 0px;
   font-family: 'Inter', sans-serif;
+  padding-top: 0.6em;
+  padding-bottom: 0em;
+  font-weight: bold;
 }
 
 p {
   margin: 0px;
-  padding-top: 10px;
+  padding-top: 1.2em;
   font-family: 'Inter', sans-serif;
 }
 
@@ -42,4 +45,13 @@ p.footer {
 
 #canvas-wrapper {
   height: 480px;
+}
+
+#label {
+  font-size: 1.2em;
+}
+
+#friends {
+  color: grey;
+  font-size: 1em;
 }
