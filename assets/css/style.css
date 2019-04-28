@@ -46,6 +46,7 @@ p.footer {
 #canvas-wrapper {
   height: 480px;
   margin-top: 3em;
+  margin-bottom: 2em;
 }
 
 #label {
