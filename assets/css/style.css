@@ -30,8 +30,11 @@ p {
 }
 
 a {
-  color: #0926E6;
-  text-decoration-line: none;
+  color: inherit;
+}
+
+a:hover {
+  color: black;
 }
 
 .logo {
